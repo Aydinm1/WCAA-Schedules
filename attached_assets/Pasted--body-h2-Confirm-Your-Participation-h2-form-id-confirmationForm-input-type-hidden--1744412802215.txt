@@ -1,0 +1,164 @@
+<body>
+
+<h2>Confirm Your Participation</h2>
+
+
+
+ <form id="confirmationForm">
+
+  <input type="hidden" id="personId" value="rec9hpttgeJK6o0PY"> 
+
+
+
+  <div id="sessionList">
+
+   <!-- Session entries will be injected here -->
+
+  </div>
+
+
+
+  <button type="submit">Submit Confirmations</button>
+
+ </form>
+
+
+
+ <script>
+
+  const AIRTABLE_BASE_ID = 'app7lzVO1a8hSpV95'; // Your base ID
+
+  const AIRTABLE_API_KEY = 'pat1pfDE7smhUjHNC'; // Your personal access token
+
+  const EVENT_TABLE = 'Event Participation';
+
+  const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${EVENT_TABLE}`;
+
+
+
+  const params = new URLSearchParams(window.location.search);
+
+  const personId = params.get("id") || document.getElementById('personId').value;
+
+
+
+  async function loadSessions() {
+
+   const res = await fetch(`${AIRTABLE_URL}?filterByFormula=${encodeURIComponent(`{Person Assigned}='${personId}'`)}`, {
+
+    headers: {
+
+     'Authorization': `Bearer ${AIRTABLE_API_KEY}`
+
+    }
+
+   });
+
+   const data = await res.json();
+
+   const sessionList = document.getElementById('sessionList');
+
+
+
+   data.records.forEach(record => {
+
+    const sessionName = record.fields['Retreat/Festival Sessions'] || 'Unnamed Session';
+
+    const role = record.fields['Role'] || '';
+
+    const confirmed = record.fields['Confirmation from Invite?'] || '';
+
+
+
+    const container = document.createElement('div');
+
+    container.style.marginBottom = '10px';
+
+
+
+    const label = document.createElement('label');
+
+    label.innerHTML = `<strong>${sessionName}</strong> (${role})<br/>Confirmation: `;
+
+
+
+    const select = document.createElement('select');
+
+    select.name = 'confirmation';
+
+    select.dataset.recordId = record.id;
+
+
+
+    const options = ['Yes', 'No'];
+
+    options.forEach(opt => {
+
+     const option = document.createElement('option');
+
+     option.value = opt;
+
+     option.text = opt;
+
+     if (opt === confirmed) option.selected = true;
+
+     select.appendChild(option);
+
+    });
+
+
+
+    container.appendChild(label);
+
+    container.appendChild(select);
+
+    sessionList.appendChild(container);
+
+   });
+
+  }
+
+
+
+  loadSessions();
+
+
+
+document.getElementById('confirmationForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const selects = document.querySelectorAll('select[name="confirmation"]');
+  const updates = [];
+
+  selects.forEach(select => {
+    updates.push({
+      id: select.dataset.recordId,
+      fields: {
+        "Confirmation from Invite?": select.value
+      }
+    });
+  });
+
+  const res = await fetch(AIRTABLE_URL, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ records: updates })
+  });
+
+  if (res.ok) {
+    alert('Confirmations submitted successfully!');
+  } else {
+    const error = await res.json();
+    console.error(error);
+    alert('Error submitting confirmations.');
+  }
+});
+
+
+ </script>
+
+</body>
+
