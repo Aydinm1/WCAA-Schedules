@@ -13,7 +13,7 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 # Get Airtable credentials from environment variables
 AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID")
 AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY") 
-EVENT_TABLE = os.environ.get("EVENT_TABLE", "Event Participation")
+EVENT_TABLE = os.environ.get("EVENT_TABLE", "tblLYaj9vr91ryIH9")  # Using table ID for stability
 
 @app.route('/')
 def index():
@@ -30,6 +30,13 @@ def get_sessions(person_id):
         airtable_url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{EVENT_TABLE}"
         filter_formula = f"{{Person Assigned}}='{person_id}'"
         
+        # Log the request details for debugging (without exposing full API key)
+        logging.debug(f"Airtable URL: {airtable_url}")
+        logging.debug(f"Person ID: {person_id}")
+        logging.debug(f"API Key (first 4 chars): {AIRTABLE_API_KEY[:4]}...")
+        logging.debug(f"Base ID: {AIRTABLE_BASE_ID}")
+        logging.debug(f"Filter formula: {filter_formula}")
+        
         headers = {
             'Authorization': f'Bearer {AIRTABLE_API_KEY}',
             'Content-Type': 'application/json'
@@ -40,6 +47,12 @@ def get_sessions(person_id):
         }
         
         response = requests.get(airtable_url, headers=headers, params=params)
+        
+        # Log more details about the response
+        logging.debug(f"Response status code: {response.status_code}")
+        if response.status_code != 200:
+            logging.error(f"Response error body: {response.text}")
+        
         response.raise_for_status()
         
         return jsonify(response.json())
