@@ -15,6 +15,12 @@ AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID")
 AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY") 
 EVENT_TABLE = os.environ.get("EVENT_TABLE", "tblLYaj9vr91ryIH9")  # Using table ID for stability
 
+# Airtable field names - customize these to match your Airtable structure
+FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "Person Assigned")
+FIELD_SESSION_NAME = os.environ.get("FIELD_SESSION_NAME", "Retreat/Festival Sessions")
+FIELD_ROLE = os.environ.get("FIELD_ROLE", "Role")
+FIELD_CONFIRMATION = os.environ.get("FIELD_CONFIRMATION", "Confirmation from Invite?")
+
 @app.route('/')
 def index():
     person_id = request.args.get('id')
@@ -28,14 +34,18 @@ def get_sessions(person_id):
     """Fetch sessions for a specific person from Airtable"""
     try:
         airtable_url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{EVENT_TABLE}"
-        filter_formula = f"{{Person Assigned}}='{person_id}'"
+        filter_formula = f"{{{FIELD_PERSON_ASSIGNED}}}='{person_id}'"
         
         # Log the request details for debugging (without exposing full API key)
         logging.debug(f"Airtable URL: {airtable_url}")
         logging.debug(f"Person ID: {person_id}")
-        logging.debug(f"API Key (first 4 chars): {AIRTABLE_API_KEY[:4]}...")
+        logging.debug(f"API Key (first 4 chars): {AIRTABLE_API_KEY[:4] if AIRTABLE_API_KEY else 'None'}...")
         logging.debug(f"Base ID: {AIRTABLE_BASE_ID}")
         logging.debug(f"Filter formula: {filter_formula}")
+        logging.debug(f"Person Assigned field: {FIELD_PERSON_ASSIGNED}")
+        logging.debug(f"Session Name field: {FIELD_SESSION_NAME}")
+        logging.debug(f"Role field: {FIELD_ROLE}")
+        logging.debug(f"Confirmation field: {FIELD_CONFIRMATION}")
         
         headers = {
             'Authorization': f'Bearer {AIRTABLE_API_KEY}',
