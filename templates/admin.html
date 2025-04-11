@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Airtable Configuration{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h2 class="mb-0">Airtable Configuration</h2>
+    </div>
+    <div class="card-body">
+        <div id="loading" class="text-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading table information...</p>
+        </div>
+        
+        <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+            There was an error loading the table information. Please check your API credentials.
+        </div>
+        
+        <div id="tableInfo" class="d-none">
+            <h3>Table Fields</h3>
+            <div class="alert alert-info mb-4">
+                <p><strong>Note:</strong> The field names below are case-sensitive and must match exactly in your application configuration.</p>
+            </div>
+            
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Field Type</th>
+                    </tr>
+                </thead>
+                <tbody id="fieldsList">
+                    <!-- Fields will be populated here -->
+                </tbody>
+            </table>
+            
+            <h3 class="mt-4">Sample Record</h3>
+            <pre id="sampleRecord" class="bg-dark text-light p-3 rounded"></pre>
+            
+            <h3 class="mt-4">Current Configuration</h3>
+            <table class="table">
+                <tr>
+                    <th>Person Field:</th>
+                    <td id="personField"></td>
+                </tr>
+                <tr>
+                    <th>Session Field:</th>
+                    <td id="sessionField"></td>
+                </tr>
+                <tr>
+                    <th>Role Field:</th>
+                    <td id="roleField"></td>
+                </tr>
+                <tr>
+                    <th>Confirmation Field:</th>
+                    <td id="confirmationField"></td>
+                </tr>
+            </table>
+            
+            <div class="alert alert-warning">
+                <p><strong>Important:</strong> If the field names above don't match the actual fields in your Airtable, update them in the application configuration.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Get elements
+    const loadingElement = document.getElementById('loading');
+    const errorMessageElement = document.getElementById('errorMessage');
+    const tableInfoElement = document.getElementById('tableInfo');
+    const fieldsListElement = document.getElementById('fieldsList');
+    const sampleRecordElement = document.getElementById('sampleRecord');
+    const personFieldElement = document.getElementById('personField');
+    const sessionFieldElement = document.getElementById('sessionField');
+    const roleFieldElement = document.getElementById('roleField');
+    const confirmationFieldElement = document.getElementById('confirmationField');
+    
+    // Function to load table info
+    async function loadTableInfo() {
+        try {
+            const response = await fetch('/api/table-info');
+            
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            // Hide loading spinner
+            loadingElement.classList.add('d-none');
+            
+            // Show the table info section
+            tableInfoElement.classList.remove('d-none');
+            
+            // Check if we have records
+            if (!data.records || data.records.length === 0) {
+                return;
+            }
+            
+            // Get the first record as a sample
+            const sampleRecord = data.records[0];
+            
+            // Extract field names and types
+            const fields = Object.keys(sampleRecord.fields).map(field => ({
+                name: field,
+                type: typeof sampleRecord.fields[field]
+            }));
+            
+            // Display fields
+            fields.forEach(field => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${field.name}</td>
+                    <td>${field.type}</td>
+                `;
+                fieldsListElement.appendChild(row);
+            });
+            
+            // Display sample record
+            sampleRecordElement.textContent = JSON.stringify(sampleRecord, null, 2);
+            
+            // Show current configuration
+            personFieldElement.textContent = {{ field_person_assigned|tojson }};
+            sessionFieldElement.textContent = {{ field_session_name|tojson }};
+            roleFieldElement.textContent = {{ field_role|tojson }};
+            confirmationFieldElement.textContent = {{ field_confirmation|tojson }};
+            
+        } catch (error) {
+            console.error('Error loading table info:', error);
+            loadingElement.classList.add('d-none');
+            errorMessageElement.classList.remove('d-none');
+        }
+    }
+    
+    // Load table info on page load
+    loadTableInfo();
+});
+</script>
+{% endblock %}

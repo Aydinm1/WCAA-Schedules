@@ -16,7 +16,8 @@ AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
 EVENT_TABLE = os.environ.get("EVENT_TABLE", "tblLYaj9vr91ryIH9")  # Using table ID for stability
 
 # Airtable field names - customize these to match your Airtable structure
-FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "Person Assigned")
+# Note: Field names are case-sensitive in Airtable
+FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "Person")  # Updated field name
 FIELD_SESSION_NAME = os.environ.get("FIELD_SESSION_NAME", "Retreat/Festival Sessions")
 FIELD_ROLE = os.environ.get("FIELD_ROLE", "Role")
 FIELD_CONFIRMATION = os.environ.get("FIELD_CONFIRMATION", "Confirmation from Invite?")
@@ -32,6 +33,35 @@ def index():
                            field_session_name=FIELD_SESSION_NAME,
                            field_role=FIELD_ROLE,
                            field_confirmation=FIELD_CONFIRMATION)
+
+@app.route('/admin')
+def admin():
+    """Admin page to check Airtable configuration"""
+    return render_template('admin.html',
+                          field_person_assigned=FIELD_PERSON_ASSIGNED,
+                          field_session_name=FIELD_SESSION_NAME,
+                          field_role=FIELD_ROLE,
+                          field_confirmation=FIELD_CONFIRMATION)
+
+@app.route('/api/table-info', methods=['GET'])
+def get_table_info():
+    """Get metadata about Airtable table (fields, etc.)"""
+    try:
+        airtable_url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{EVENT_TABLE}"
+        
+        headers = {
+            'Authorization': f'Bearer {AIRTABLE_API_KEY}',
+            'Content-Type': 'application/json'
+        }
+        
+        # Make request without filtering to get some records and inspect fields
+        response = requests.get(airtable_url, headers=headers, params={'maxRecords': 1})
+        response.raise_for_status()
+        
+        return jsonify(response.json())
+    except Exception as e:
+        logging.error(f"Error fetching table info: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/sessions/<person_id>', methods=['GET'])
 def get_sessions(person_id):
