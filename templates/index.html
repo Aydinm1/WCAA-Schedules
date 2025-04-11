@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Your Participation{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Confirm Your Participation</h2>
+    </div>
+    <div class="card-body">
+        <div id="loading" class="text-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading your sessions...</p>
+        </div>
+        
+        <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+            There was an error loading your sessions. Please try again later.
+        </div>
+        
+        <div id="noSessions" class="alert alert-info d-none" role="alert">
+            You don't have any sessions assigned to you.
+        </div>
+        
+        <form id="confirmationForm" class="d-none">
+            <input type="hidden" id="personId" value="{{ person_id }}">
+            
+            <div id="sessionList" class="mb-4">
+                <!-- Session entries will be injected here -->
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <span data-feather="check-circle"></span>
+                    Submit Confirmations
+                </button>
+            </div>
+        </form>
+        
+        <div id="successMessage" class="alert alert-success d-none" role="alert">
+            <span data-feather="check-circle"></span>
+            Your confirmations have been submitted successfully!
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

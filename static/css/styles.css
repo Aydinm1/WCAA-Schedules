@@ -1,0 +1,54 @@
+/* Additional custom styles beyond Bootstrap */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+.session-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--bs-secondary);
+    margin-bottom: 1rem;
+}
+
+.session-card:hover {
+    border-left-color: var(--bs-primary);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.session-card.confirmed {
+    border-left-color: var(--bs-success);
+}
+
+.session-card.declined {
+    border-left-color: var(--bs-danger);
+}
+
+.form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Animation for the success message */
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.fade-in-out {
+    animation: fadeInOut 5s forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .card-header h2 {
+        font-size: 1.5rem;
+    }
+}
