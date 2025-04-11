@@ -1,0 +1,68 @@
+
+Field Name	Field Type
+04 - Proficiency (from People 2)	object
+Date	string
+Email (from WCAA Assigned)	object
+Event Description (from Retreat/Festival Sessions)	object
+Event Name	string
+Festival POC (from Retreat/Festival Sessions)	object
+Festival POC Contact (from Retreat/Festival Sessions) 2	object
+Last Modified	string
+Name (from WCAA Assigned)	object
+Retreat/Festival Sessions	object
+Role	string
+Session Date/Time (from Retreat/Festival Sessions)	object
+Session Location (from Retreat/Festival Sessions)	object
+WCAA Arrival Time (from Retreat/Festival Sessions)	object
+WCAA Assigned	object
+Sample Record
+{
+  "createdTime": "2025-04-11T01:34:18.000Z",
+  "fields": {
+    "04 - Proficiency (from People 2)": [
+      "Sports - Worldclass",
+      "Sports - Olympic Qualifying",
+      "Sports - Olympic 2024 Potential"
+    ],
+    "Date": "2025-04-11",
+    "Email (from WCAA Assigned)": [
+      "natalialadha@gmail.com"
+    ],
+    "Event Description (from Retreat/Festival Sessions)": [
+      "Panel event celebrates trailblazing female athletes who defy stereotypes and pave the way for future generations. It highlights their inspiring stories of resilience, determination, and achievements in transforming sports. "
+    ],
+    "Event Name": "Echoes of Excellence - Young Women Breaking the Mold in Sports",
+    "Festival POC (from Retreat/Festival Sessions)": [
+      "Prince Lakhani"
+    ],
+    "Festival POC Contact (from Retreat/Festival Sessions) 2": [
+      "princelakhani17@gmail.com"
+    ],
+    "Last Modified": "2025-04-11T01:36:33.000Z",
+    "Name (from WCAA Assigned)": [
+      "Natalia Ladha"
+    ],
+    "Retreat/Festival Sessions": [
+      "recHtHpH4sqnuuFqx"
+    ],
+    "Role": "Panelist",
+    "Session Date/Time (from Retreat/Festival Sessions)": [
+      "2025-07-22T17:00:00.000Z"
+    ],
+    "Session Location (from Retreat/Festival Sessions)": [
+      "Hall 2 - Multi-Purpose Hall"
+    ],
+    "WCAA Arrival Time (from Retreat/Festival Sessions)": [
+      "12:00"
+    ],
+    "WCAA Assigned": [
+      "recqUoNCWMyecMrPX"
+    ]
+  },
+  "id": "rec0R15v3bvWLwuia"
+}
+Current Configuration
+Person Field:	Person
+Session Field:	Retreat/Festival Sessions
+Role Field:	Role
+Confirmation Field:	Confirmation from Invite?

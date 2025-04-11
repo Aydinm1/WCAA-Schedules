@@ -17,7 +17,7 @@ EVENT_TABLE = os.environ.get("EVENT_TABLE", "tblLYaj9vr91ryIH9")  # Using table 
 
 # Airtable field names - customize these to match your Airtable structure
 # Note: Field names are case-sensitive in Airtable
-FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "Person")  # Updated field name
+FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "WCAA Assigned")  # Updated based on admin page
 FIELD_SESSION_NAME = os.environ.get("FIELD_SESSION_NAME", "Retreat/Festival Sessions")
 FIELD_ROLE = os.environ.get("FIELD_ROLE", "Role")
 FIELD_CONFIRMATION = os.environ.get("FIELD_CONFIRMATION", "Confirmation from Invite?")
@@ -68,7 +68,10 @@ def get_sessions(person_id):
     """Fetch sessions for a specific person from Airtable"""
     try:
         airtable_url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{EVENT_TABLE}"
-        filter_formula = f"{{{FIELD_PERSON_ASSIGNED}}}='{person_id}'"
+        
+        # For linked record fields in Airtable we use a different approach
+        # Check if the array of linked records contains our ID
+        filter_formula = f"FIND('{person_id}', ARRAYJOIN({{{FIELD_PERSON_ASSIGNED}}})) > 0"
         
         # Log the request details for debugging (without exposing full API key)
         logging.debug(f"Airtable URL: {airtable_url}")
@@ -116,7 +119,15 @@ def confirm_sessions():
             'Content-Type': 'application/json'
         }
         
+        logging.debug(f"Updating confirmations with data: {data}")
+        
         response = requests.patch(airtable_url, headers=headers, json=data)
+        
+        # Log response info for debugging
+        logging.debug(f"Response status code: {response.status_code}")
+        if response.status_code != 200:
+            logging.error(f"Response error body: {response.text}")
+            
         response.raise_for_status()
         
         return jsonify({"success": True, "message": "Confirmations updated successfully"})
