@@ -69,40 +69,72 @@ def get_sessions(person_id):
     try:
         airtable_url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{EVENT_TABLE}"
         
-        # For linked record fields in Airtable we use a different approach
-        # Check if the array of linked records contains our ID
-        filter_formula = f"FIND('{person_id}', ARRAYJOIN({{{FIELD_PERSON_ASSIGNED}}})) > 0"
-        
-        # Log the request details for debugging (without exposing full API key)
+        # Log the request details for debugging
         logging.debug(f"Airtable URL: {airtable_url}")
         logging.debug(f"Person ID: {person_id}")
-        logging.debug(f"API Key (first 4 chars): {AIRTABLE_API_KEY[:4] if AIRTABLE_API_KEY else 'None'}...")
-        logging.debug(f"Base ID: {AIRTABLE_BASE_ID}")
-        logging.debug(f"Filter formula: {filter_formula}")
-        logging.debug(f"Person Assigned field: {FIELD_PERSON_ASSIGNED}")
-        logging.debug(f"Session Name field: {FIELD_SESSION_NAME}")
-        logging.debug(f"Role field: {FIELD_ROLE}")
-        logging.debug(f"Confirmation field: {FIELD_CONFIRMATION}")
+        logging.debug(f"Using fields - Person: {FIELD_PERSON_ASSIGNED}, Session: {FIELD_SESSION_NAME}, Role: {FIELD_ROLE}")
+        # No need for filter_formula, as we're filtering in Python code instead
         
         headers = {
             'Authorization': f'Bearer {AIRTABLE_API_KEY}',
             'Content-Type': 'application/json'
         }
         
+        # First, get all records without filtering (up to 100)
         params = {
-            'filterByFormula': filter_formula
+            'maxRecords': 100
         }
         
         response = requests.get(airtable_url, headers=headers, params=params)
-        
-        # Log more details about the response
-        logging.debug(f"Response status code: {response.status_code}")
-        if response.status_code != 200:
-            logging.error(f"Response error body: {response.text}")
-        
         response.raise_for_status()
         
-        return jsonify(response.json())
+        all_data = response.json()
+        all_records = all_data.get('records', [])
+        logging.debug(f"Retrieved {len(all_records)} total records")
+        
+        # Now filter the records manually to find those that match our person ID
+        matching_records = []
+        for record in all_records:
+            fields = record.get('fields', {})
+            # Log every record's fields for debugging
+            logging.debug(f"Record ID: {record.get('id')} - Fields: {fields}")
+            
+            # Get the assigned persons field
+            assigned_persons = fields.get(FIELD_PERSON_ASSIGNED, [])
+            
+            # More thorough debugging of this field
+            logging.debug(f"FIELD_PERSON_ASSIGNED value: {assigned_persons}")
+            logging.debug(f"Type: {type(assigned_persons)}")
+            
+            # Try multiple approaches to match
+            found_match = False
+            
+            # Check if this is a list/array and if our person_id is in it
+            if isinstance(assigned_persons, list):
+                for person in assigned_persons:
+                    if isinstance(person, str) and person_id in person:
+                        found_match = True
+                        break
+            # If it's a string, check if it contains our person_id
+            elif isinstance(assigned_persons, str) and person_id in assigned_persons:
+                found_match = True
+                
+            # If we found a match, add the record
+            if found_match:
+                matching_records.append(record)
+        
+        logging.debug(f"Found {len(matching_records)} matching records for person ID: {person_id}")
+        
+        # If we have any matching records, log the first one
+        if matching_records:
+            logging.debug(f"First matching record fields: {matching_records[0].get('fields', {})}")
+        
+        # Return the filtered data
+        result = {
+            'records': matching_records
+        }
+        return jsonify(result)
+    
     except Exception as e:
         logging.error(f"Error fetching sessions: {str(e)}")
         return jsonify({"error": str(e)}), 500
