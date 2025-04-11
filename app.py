@@ -27,7 +27,11 @@ def index():
     if not person_id:
         return render_template('error.html', 
                                message="No person ID provided. Please use a valid link with an ID parameter. Example: /?id=rec9hpttgeJK6o0PY")
-    return render_template('index.html', person_id=person_id)
+    return render_template('index.html', 
+                           person_id=person_id,
+                           field_session_name=FIELD_SESSION_NAME,
+                           field_role=FIELD_ROLE,
+                           field_confirmation=FIELD_CONFIRMATION)
 
 @app.route('/api/sessions/<person_id>', methods=['GET'])
 def get_sessions(person_id):

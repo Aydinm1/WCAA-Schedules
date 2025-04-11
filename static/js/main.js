@@ -49,11 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear existing sessions
             sessionListElement.innerHTML = '';
             
+            // Get field names from hidden inputs
+            const fieldSessionName = document.getElementById('fieldSessionName').value;
+            const fieldRole = document.getElementById('fieldRole').value;
+            const fieldConfirmation = document.getElementById('fieldConfirmation').value;
+            
             // Add each session to the list
             data.records.forEach(record => {
-                const sessionName = record.fields['Retreat/Festival Sessions'] || 'Unnamed Session';
-                const role = record.fields['Role'] || 'Participant';
-                const confirmed = record.fields['Confirmation from Invite?'] || '';
+                const sessionName = record.fields[fieldSessionName] || 'Unnamed Session';
+                const role = record.fields[fieldRole] || 'Participant';
+                const confirmed = record.fields[fieldConfirmation] || '';
                 
                 // Create session card
                 const sessionCard = document.createElement('div');
@@ -113,17 +118,22 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmationForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Get field name for confirmation
+        const fieldConfirmation = document.getElementById('fieldConfirmation').value;
+        
         // Gather all confirmation data
         const selects = document.querySelectorAll('.confirmation-select');
         const updates = [];
         
         selects.forEach(select => {
             if (select.value) {  // Only submit if a selection was made
+                // Create a fields object with the dynamic field name
+                const fields = {};
+                fields[fieldConfirmation] = select.value;
+                
                 updates.push({
                     id: select.dataset.recordId,
-                    fields: {
-                        "Confirmation from Invite?": select.value
-                    }
+                    fields: fields
                 });
             }
         });

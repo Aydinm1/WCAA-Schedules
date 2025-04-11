@@ -26,6 +26,11 @@
         <form id="confirmationForm" class="d-none">
             <input type="hidden" id="personId" value="{{ person_id }}">
             
+            <!-- Hidden fields for Airtable field names -->
+            <input type="hidden" id="fieldSessionName" value="{{ field_session_name }}">
+            <input type="hidden" id="fieldRole" value="{{ field_role }}">
+            <input type="hidden" id="fieldConfirmation" value="{{ field_confirmation }}">
+            
             <div id="sessionList" class="mb-4">
                 <!-- Session entries will be injected here -->
             </div>
