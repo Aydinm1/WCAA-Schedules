@@ -10,9 +10,9 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 
-# Get Airtable credentials from environment variables with fallbacks for development
-AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID", "app7lzVO1a8hSpV95")
-AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY", "pat1pfDE7smhUjHNC")
+# Get Airtable credentials from environment variables
+AIRTABLE_BASE_ID = os.environ.get("AIRTABLE_BASE_ID")
+AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY") 
 EVENT_TABLE = os.environ.get("EVENT_TABLE", "Event Participation")
 
 @app.route('/')
