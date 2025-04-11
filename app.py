@@ -18,7 +18,7 @@ EVENT_TABLE = os.environ.get("EVENT_TABLE", "tblLYaj9vr91ryIH9")  # Using table 
 # Airtable field names - customize these to match your Airtable structure
 # Note: Field names are case-sensitive in Airtable
 FIELD_PERSON_ASSIGNED = os.environ.get("FIELD_PERSON_ASSIGNED", "WCAA Assigned")  # Updated based on admin page
-FIELD_SESSION_NAME = os.environ.get("FIELD_SESSION_NAME", "Retreat/Festival Sessions")
+FIELD_SESSION_NAME = os.environ.get("FIELD_SESSION_NAME", "Event Name")  # Using Event Name instead of the linked record ID
 FIELD_ROLE = os.environ.get("FIELD_ROLE", "Role")
 FIELD_CONFIRMATION = os.environ.get("FIELD_CONFIRMATION", "Confirmation from Invite?")
 
