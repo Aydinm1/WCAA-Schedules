@@ -22,6 +22,7 @@ args = "Start application"
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
+mode = "sequential"
 
 [workflows.workflow.metadata]
 agentRequireRestartOnSave = false
@@ -32,7 +33,18 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
-waitForPort = 5000
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git remote add origin https://github.com/Aydinm1/WCAA-Schedules.git"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git branch -M main"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = " git push -u origin main"
 
 [[ports]]
 localPort = 5000

@@ -25,6 +25,7 @@ FIELD_CONFIRMATION = os.environ.get("FIELD_CONFIRMATION", "Confirmation from Inv
 @app.route('/')
 def index():
     person_id = request.args.get('id')
+
     if not person_id:
         return render_template('error.html', 
                                message="No person ID provided. Please use a valid link with an ID parameter. Example: /?id=rec9hpttgeJK6o0PY")
