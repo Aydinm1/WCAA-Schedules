@@ -49,7 +49,7 @@ export default function HomePage() {
         if (matches.length > 0 && matches[0].fields['Name (from WCAA Assigned)']) {
           setParticipantName(matches[0].fields['Name (from WCAA Assigned)']);
         }
-    
+    //set sessions now by date
         setSessions(
           matches.sort((a, b) => {
             const dateA = new Date(a.fields['Session Date/Time (from Retreat/Festival Sessions)']);
