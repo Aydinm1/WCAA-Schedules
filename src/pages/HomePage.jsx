@@ -26,7 +26,8 @@ export default function HomePage() {
           `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
           {
             headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
-            params: { maxRecords: 100 },
+            params: { pageSize: 100 },
+
           }
         );
 
