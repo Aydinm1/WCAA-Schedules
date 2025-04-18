@@ -50,7 +50,13 @@ export default function HomePage() {
           setParticipantName(matches[0].fields['Name (from WCAA Assigned)']);
         }
     
-        setSessions(matches);
+        setSessions(
+          matches.sort((a, b) => {
+            const dateA = new Date(a.fields['Session Date/Time (from Retreat/Festival Sessions)']);
+            const dateB = new Date(b.fields['Session Date/Time (from Retreat/Festival Sessions)']);
+            return dateA - dateB;
+          })
+        );        
       } catch (err) {
         setError('Failed to load sessions.');
         console.error(err);
