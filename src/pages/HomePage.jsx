@@ -21,25 +21,35 @@ export default function HomePage() {
     }
 
     const fetchSessions = async () => {
+      let allRecords = [];
+      let offset = undefined;
+    
       try {
-        const res = await axios.get(
-          `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
-          {
-            headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
-            params: { pageSize: 100 },
-
-          }
-        );
-
-        const matches = res.data.records.filter((record) => {
+        do {
+          const res = await axios.get(
+            `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
+            {
+              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+              params: {
+                pageSize: 100,
+                offset: offset,
+              },
+            }
+          );
+    
+          allRecords = [...allRecords, ...res.data.records];
+          offset = res.data.offset;
+        } while (offset);
+    
+        const matches = allRecords.filter((record) => {
           const assigned = record.fields['WCAA Assigned'];
           return Array.isArray(assigned) && assigned.includes(personId);
         });
-
+    
         if (matches.length > 0 && matches[0].fields['Name (from WCAA Assigned)']) {
           setParticipantName(matches[0].fields['Name (from WCAA Assigned)']);
         }
-
+    
         setSessions(matches);
       } catch (err) {
         setError('Failed to load sessions.');
@@ -48,6 +58,7 @@ export default function HomePage() {
         setLoading(false);
       }
     };
+    
 
     fetchSessions();
   }, [personId]);
