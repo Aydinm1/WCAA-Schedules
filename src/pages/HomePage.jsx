@@ -22,22 +22,31 @@ export default function HomePage() {
 
     const fetchSessions = async () => {
       let allRecords = [];
-      let offset = undefined;
+      let offset;
     
       try {
         do {
           const res = await axios.get(
             `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
             {
-              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+              },
               params: {
                 pageSize: 100,
-                offset: offset,
+                offset,
+                // ← ADD THIS BLOCK ↓
+                sort: [
+                  {
+                    field: 'Session Date/Time (from Retreat/Festival Sessions)',
+                    direction: 'asc',
+                  },
+                ],
               },
             }
           );
     
-          allRecords = [...allRecords, ...res.data.records];
+          allRecords = allRecords.concat(res.data.records);
           offset = res.data.offset;
         } while (offset);
     
@@ -46,17 +55,10 @@ export default function HomePage() {
           return Array.isArray(assigned) && assigned.includes(personId);
         });
     
-        if (matches.length > 0 && matches[0].fields['Name (from WCAA Assigned)']) {
-          setParticipantName(matches[0].fields['Name (from WCAA Assigned)']);
-        }
-    //set sessions now by date
-        setSessions(
-          matches.sort((a, b) => {
-            const dateA = new Date(a.fields['Session Date/Time (from Retreat/Festival Sessions)']);
-            const dateB = new Date(b.fields['Session Date/Time (from Retreat/Festival Sessions)']);
-            return dateA - dateB;
-          })
-        );        
+        // No need for client‑side sort—API has already ordered them
+        setSessions(matches);
+    
+        // …rest of your logic…
       } catch (err) {
         setError('Failed to load sessions.');
         console.error(err);
@@ -64,6 +66,7 @@ export default function HomePage() {
         setLoading(false);
       }
     };
+    
     
 
     fetchSessions();
