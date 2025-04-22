@@ -6,7 +6,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [participantName, setParticipantName] = useState('Participant');
+  const [participantName, setParticipantName] = useState('');
 
   const personId = new URLSearchParams(window.location.search).get('id');
   const fieldSessionName = 'Event Name';
@@ -21,88 +21,73 @@ export default function HomePage() {
     }
 
     const fetchSessions = async () => {
-      let allRecords = [];
-      let offset;
-    
       try {
+        let all = [], offset;
         do {
           const res = await axios.get(
             `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
             {
-              headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-              },
-              params: {
-                pageSize: 100,
-                offset,
-                // ← ADD THIS BLOCK ↓
-                sort: [
-                  {
-                    field: 'Session Date/Time (from Retreat/Festival Sessions)',
-                    direction: 'asc',
-                  },
-                ],
-              },
+              headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
+              params: { pageSize: 100, offset, sort: [{ field: 'Session Date/Time (from Retreat/Festival Sessions)', direction: 'asc' }] },
             }
           );
-    
-          allRecords = allRecords.concat(res.data.records);
+          all = all.concat(res.data.records);
           offset = res.data.offset;
         } while (offset);
-    
-        const matches = allRecords.filter((record) => {
-          const assigned = record.fields['WCAA Assigned'];
-          return Array.isArray(assigned) && assigned.includes(personId);
-        });
-    
-        // No need for client‑side sort—API has already ordered them
-        setSessions(matches);
-    
-        // …rest of your logic…
+        setSessions(all.filter(r => Array.isArray(r.fields['WCAA Assigned']) && r.fields['WCAA Assigned'].includes(personId)));
       } catch (err) {
-        setError('Failed to load sessions.');
         console.error(err);
-      } finally {
-        setLoading(false);
+        setError('Failed to load sessions.');
       }
     };
-    
-    
 
-    fetchSessions();
+    const fetchParticipant = async () => {
+      try {
+        const res = await axios.get(
+          `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/People/${personId}`,
+          { headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` } }
+        );
+        setParticipantName(res.data.fields['Name'] || '');
+      } catch {}
+    };
+
+    Promise.all([fetchSessions(), fetchParticipant()]).finally(() => setLoading(false));
   }, [personId]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-
     const updates = sessions
-      .map((s) => {
-        const selectEl = document.getElementById(`confirmation-${s.id}`);
-        return { id: s.id, fields: { [fieldConfirmation]: selectEl.value } };
+      .map(s => {
+        const val = document.getElementById(`confirmation-${s.id}`).value;
+        return { id: s.id, fields: { [fieldConfirmation]: val } };
       })
-      .filter((update) => update.fields[fieldConfirmation] !== '');
+      .filter(u => u.fields[fieldConfirmation] !== '');
 
-    if (updates.length === 0) return alert('Please make at least one selection before submitting.');
+    if (!updates.length) return alert('Please make at least one selection before submitting.');
 
     try {
       await axios.patch(
         `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
         { records: updates },
-        { headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' } }
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
       );
-
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      alert('Error submitting responses. Please try again.');
       console.error(err);
+      alert('Error submitting responses. Please try again.');
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'TBD';
-    return new Date(dateString).toLocaleString('en-US', {
+  const formatDate = ds => {
+    if (!ds) return 'TBD';
+    return new Date(ds).toLocaleString('en-US', {
       timeZone: 'America/Chicago',
       dateStyle: 'full',
       timeStyle: 'short',
@@ -118,15 +103,13 @@ export default function HomePage() {
         <p className="mt-3">Loading your events...</p>
       </div>
     );
-
   if (error)
     return (
       <div className="container text-center py-5">
         <div className="alert alert-danger">{error}</div>
       </div>
     );
-
-  if (sessions.length === 0)
+  if (!sessions.length)
     return (
       <div className="container text-center py-5">
         <div className="alert alert-info">No sessions found for your profile.</div>
@@ -134,101 +117,98 @@ export default function HomePage() {
     );
 
   return (
-    <div className="container">
-      <div className="page-header text-center">
+    <div>
+      <div className="container">
+        {/* full‑width‑of‑container banner */}
         <img
-          src="https://res.cloudinary.com/dl9d5br4j/image/upload/v1744776724/Dual_Banner_from_Aydin_s_Merchant_e1uvhl.png"
+          src="https://res.cloudinary.com/dl9d5br4j/image/upload/v1745126797/TI_Letterhead_4x6_1_hzopb5.png"
           alt="GE Festival Banner"
-          className="banner-image"
+          className="banner-image banner-full"
         />
 
-        <h2 className="text-center">Talent Retreat Event Confirmation</h2>
-
-        <p className="subtitle">
-          Hi {participantName}, please confirm the events that you will attend for the Talent Institute Retreat.
-        </p>
-      </div>
-
-      {success && (
-        <div className="alert alert-success text-center fade-in-out">
-          ✅ Your responses have been successfully recorded!
+        <div className="page-header text-center">
+          <h2 className="confirmation-header">TI Retreat and GE Festival Confirmation</h2>
+          <p className="subtitle">
+            Schedule for {participantName}: Please confirm your attendance for the events listed below.
+          </p>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit} id="confirmationForm">
-        {sessions.map((record) => (
-          <div
-            key={record.id}
-            className={`session-card ${
-              record.fields[fieldConfirmation] === 'Yes' ? 'confirmed' : ''
-            } ${record.fields[fieldConfirmation] === 'No' ? 'declined' : ''}`}
-          >
-            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start">
-              <div className="session-details">
-                <h4 className="session-title">{record.fields[fieldSessionName]}</h4>
-
-                {/* Role without icon */}
-                <p className="session-info">
-                  <strong>Role:</strong> {record.fields[fieldRole] || 'Participant'}
-                </p>
-
-                <p className="session-info">
-                  <strong>Description:</strong>{' '}
-                  {record.fields['Event Description (from Retreat/Festival Sessions)'] || 'No description available'}
-                </p>
-
-                <p className="session-info">
-                  <strong>Date & Time:</strong> {formatDate(record.fields['Session Date/Time (from Retreat/Festival Sessions)'])}
-                </p>
-
-                <p className="session-info">
-                  <strong>Location:</strong>{' '}
-                  {record.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}
-                </p>
-
-                <p className="session-info mb-0">
-                  <strong>Event Contact:</strong>{' '}
-                  {record.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}
-                </p>
-              </div>
-
-              <div className="session-action">
-                <label htmlFor={`confirmation-${record.id}`} className="form-label">
-                  Will you attend?
-                </label>
-                <select
-                  id={`confirmation-${record.id}`}
-                  defaultValue={record.fields[fieldConfirmation] || ''}
-                  className="form-select"
-                  disabled={record.fields['Locked']}
-                  onChange={(e) => {
-                    const card = e.target.closest('.session-card');
-                    card.classList.remove('confirmed', 'declined');
-                    if (e.target.value === 'Yes') card.classList.add('confirmed');
-                    if (e.target.value === 'No') card.classList.add('declined');
-                  }}
-                >
-                  <option value="">Select...</option>
-                  <option value="Yes">Yes, I'll attend</option>
-                  <option value="No">No, I can't attend</option>
-                </select>
-
-                {record.fields['Locked'] && (
-                  <p className="mt-2 text-secondary small" style={{ fontStyle: 'italic' }}>
-                    This response is now locked. Please contact your relationship manager to make changes.
-                  </p>
-                )}
-              </div>
-            </div>
+        {success && (
+          <div className="alert alert-success text-center fade-in-out">
+            ✅ Your responses have been successfully recorded!
           </div>
-        ))}
+        )}
 
-        <div className="text-center mt-5">
-          <button type="submit" className="submit-button">
-            Submit Responses
-          </button>
+        <div className="sessions-section">
+          <img
+            src="https://res.cloudinary.com/dl9d5br4j/image/upload/v1745118459/Purple_Icon_ztkf9d.png"
+            alt="diamond"
+            className="sessions-diamond"
+          />
+
+          <form onSubmit={handleSubmit} id="confirmationForm">
+            {sessions.map(rec => (
+              <div
+                key={rec.id}
+                className={`session-card ${
+                  rec.fields[fieldConfirmation] === 'Yes' ? 'confirmed' : ''
+                } ${
+                  rec.fields[fieldConfirmation] === 'No' ? 'declined' : ''
+                }`}
+              >
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-start">
+                  <div className="session-details">
+                    <h4 className="session-title">{rec.fields[fieldSessionName]}</h4>
+                    <p className="session-info"><strong>Role:</strong> {rec.fields[fieldRole] || 'Participant'}</p>
+                    <p className="session-info"><strong>Description:</strong> {rec.fields['Event Description (from Retreat/Festival Sessions)'] || 'No description available'}</p>
+                    <p className="session-info"><strong>Date & Time:</strong> {formatDate(rec.fields['Session Date/Time (from Retreat/Festival Sessions)'])}</p>
+                    <p className="session-info"><strong>Location:</strong> {rec.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}</p>
+                    <p className="session-info mb-0"><strong>Event Contact:</strong> {rec.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}</p>
+                  </div>
+
+                  <div className="session-action">
+                    <label htmlFor={`confirmation-${rec.id}`} className="form-label">
+                      Will you attend?
+                    </label>
+                    <select
+                      id={`confirmation-${rec.id}`}
+                      defaultValue={rec.fields[fieldConfirmation] || ''}
+                      className="form-select"
+                      disabled={rec.fields['Locked']}
+                      onChange={e => {
+                        const card = e.target.closest('.session-card');
+                        card.classList.remove('confirmed', 'declined');
+                        if (e.target.value === 'Yes') card.classList.add('confirmed');
+                        if (e.target.value === 'No') card.classList.add('declined');
+                      }}
+                    >
+                      <option value="">Select...</option>
+                      <option value="Yes">Yes, I'll attend</option>
+                      <option value="No">No, I can't attend</option>
+                    </select>
+                    {rec.fields['Locked'] && (
+                      <p className="mt-2 text-secondary small" style={{ fontStyle: 'italic' }}>
+                        This response is now locked. Please contact your relationship manager to make changes.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <div className="text-center mt-5">
+              <button type="submit" className="submit-button">
+                Submit Responses
+              </button>
+            </div>
+          </form>
+
+          {/* footer note */}
+          <p className="footer-note text-center">
+            If you require any further details, feel free to text or call +1 (555) 123-4567 — we will respond within 48 hours.
+          </p>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

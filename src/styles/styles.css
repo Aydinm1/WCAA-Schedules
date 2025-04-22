@@ -8,6 +8,41 @@ body {
   line-height: 1.6;
 }
 
+/* Banner inside container */
+.banner-image.banner-full {
+  display: block;
+  width: 100%;      /* fills container’s width */
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 0; /* no rounding */
+  box-shadow: none; /* no shadow */
+}
+
+/* Header text updates */
+.confirmation-header {
+  color: #933C80;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+/* Subtitle retains same styling */
+.subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.5;
+}
+
+/* Footer note */
+.footer-note {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Boxed content below the banner */
 .container {
   max-width: 1000px;
   padding: 2rem 1.5rem;
@@ -20,23 +55,12 @@ body {
 .page-header {
   padding-bottom: 1.5rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #eaedf0;
+  border-bottom: none;
 }
 
-h2 {
-  color: #1e40af;
-  font-weight: 700;
-  font-size: 2.2rem;
-  margin-bottom: 1rem;
-}
+/* … rest of your existing session‑card, diamond, form, responsive CSS … */
 
-.subtitle {
-  font-size: 1.2rem;
-  color: #64748b;
-  max-width: 700px;
-  margin: 0 auto 2rem auto;
-  line-height: 1.5;
-}
+
 
 .session-card {
   background-color: #ffffff;
@@ -69,18 +93,6 @@ h2 {
   color: #1e293b;
   margin-bottom: 0.75rem;
   padding-right: 1rem;
-}
-
-.session-meta {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
-.session-meta svg {
-  margin-right: 0.5rem;
 }
 
 .session-details {
@@ -170,58 +182,52 @@ h2 {
   animation: fadeInOut 5s forwards;
 }
 
-/* Responsive styles */
+.sessions-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.sessions-diamond {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 200%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  clip-path: inset(0 50% 0 0);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.sessions-section form,
+.session-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive tweaks */
 @media (max-width: 768px) {
   .session-action {
     min-width: 100%;
     margin-top: 1rem;
     padding: 1rem;
   }
-  
+
   .session-details {
     padding-right: 0;
   }
-  
+
   .session-title {
     font-size: 1.25rem;
   }
-  
+
   h2 {
     font-size: 1.8rem;
   }
-  
+
   .container {
     padding: 1.5rem 1rem;
     margin: 1rem auto;
   }
-}
-
-.banner-image {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Icons styling */
-.icon-container {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  margin-right: 0.5rem;
-  color: #64748b;
-}
-
-.page-header h2 {
-  text-align: center;
-  margin: 0 auto 1rem; /* centers and keeps consistent spacing below */
-}
-
-.page-header .subtitle {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
 }
