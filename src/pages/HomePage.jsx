@@ -126,12 +126,14 @@ export default function HomePage() {
           className="banner-image banner-full"
         />
 
-        <div className="page-header text-center">
-          <h2 className="confirmation-header">TI Retreat and GE Festival Confirmation</h2>
-          <p className="subtitle">
-            Schedule for {participantName}: Please confirm your attendance for the events listed below.
-          </p>
-        </div>
+<div className="page-header text-center">
+  <h2 className="confirmation-header">TI Retreat and GE Festival Confirmation</h2>
+  <div className="schedule-header">
+    <p className="schedule-title">Schedule for {participantName}</p>
+    <p className="schedule-subtitle">Please confirm your attendance for the events listed below.</p>
+  </div>
+</div>
+
 
         {success && (
           <div className="alert alert-success text-center fade-in-out">
@@ -163,7 +165,7 @@ export default function HomePage() {
                     <p className="session-info"><strong>Description:</strong> {rec.fields['Event Description (from Retreat/Festival Sessions)'] || 'No description available'}</p>
                     <p className="session-info"><strong>Date & Time:</strong> {formatDate(rec.fields['Session Date/Time (from Retreat/Festival Sessions)'])}</p>
                     <p className="session-info"><strong>Location:</strong> {rec.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}</p>
-                    <p className="session-info mb-0"><strong>Event Contact:</strong> {rec.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}</p>
+                   {/* <p className="session-info mb-0"><strong>Event Contact:</strong> {rec.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}</p> */}
                   </div>
 
                   <div className="session-action">

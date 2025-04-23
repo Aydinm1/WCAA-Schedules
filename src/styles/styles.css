@@ -1,3 +1,6 @@
+/*===================================
+  Global Styles
+===================================*/
 body {
   min-height: 100vh;
   display: flex;
@@ -8,41 +11,18 @@ body {
   line-height: 1.6;
 }
 
-/* Banner inside container */
+/*===================================
+  Banner & Container
+===================================*/
 .banner-image.banner-full {
   display: block;
-  width: 100%;      /* fills container’s width */
+  width: 100%;
   height: auto;
   margin-bottom: 1.5rem;
-  border-radius: 0; /* no rounding */
-  box-shadow: none; /* no shadow */
+  border-radius: 0;
+  box-shadow: none;
 }
 
-/* Header text updates */
-.confirmation-header {
-  color: #933C80;
-  font-size: 1.8rem;
-  text-align: center;
-}
-
-/* Subtitle retains same styling */
-.subtitle {
-  font-size: 1.2rem;
-  color: #64748b;
-  max-width: 700px;
-  margin: 0 auto 2rem;
-  line-height: 1.5;
-}
-
-/* Footer note */
-.footer-note {
-  margin-top: 2rem;
-  font-size: 0.95rem;
-  color: #64748b;
-  text-align: center;
-}
-
-/* Boxed content below the banner */
 .container {
   max-width: 1000px;
   padding: 2rem 1.5rem;
@@ -52,16 +32,60 @@ body {
   margin: 2rem auto;
 }
 
+/*===================================
+  Page Header
+===================================*/
 .page-header {
   padding-bottom: 1.5rem;
   margin-bottom: 2rem;
   border-bottom: none;
 }
 
-/* … rest of your existing session‑card, diamond, form, responsive CSS … */
+/* Main title */
+.confirmation-header {
+  color: #933C80;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: auto;
+}
 
+/* Secondary subtitle */
+.subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.5;
+}
 
+/*===================================
+  Sessions Section
+===================================*/
+.sessions-section {
+  position: relative;
+  overflow: hidden;
+}
 
+.sessions-diamond {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 200%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  clip-path: inset(0 50% 0 0);
+  opacity: 1;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.sessions-section form,
+.session-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* Card styles */
 .session-card {
   background-color: #ffffff;
   border-radius: 12px;
@@ -87,6 +111,7 @@ body {
   background-color: #fef2f2;
 }
 
+/* Session details */
 .session-title {
   font-weight: 600;
   font-size: 1.35rem;
@@ -110,6 +135,7 @@ body {
   color: #475569;
 }
 
+/* Action panel */
 .session-action {
   min-width: 220px;
   background-color: #f8fafc;
@@ -140,6 +166,7 @@ body {
   outline: none;
 }
 
+/* Submit button */
 .submit-button {
   font-weight: 600;
   font-size: 1.1rem;
@@ -161,6 +188,7 @@ body {
   transform: translateY(1px);
 }
 
+/* Success alert */
 .alert-success {
   background-color: #dcfce7;
   color: #166534;
@@ -182,31 +210,17 @@ body {
   animation: fadeInOut 5s forwards;
 }
 
-.sessions-section {
-  position: relative;
-  overflow: hidden;
+/* Footer note */
+.footer-note {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
 }
 
-.sessions-diamond {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  width: 200%;
-  height: auto;
-  transform: translate(-50%, -50%);
-  clip-path: inset(0 50% 0 0);
-  opacity: 1;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.sessions-section form,
-.session-card {
-  position: relative;
-  z-index: 1;
-}
-
-/* Responsive tweaks */
+/*===================================
+  Responsive
+===================================*/
 @media (max-width: 768px) {
   .session-action {
     min-width: 100%;
@@ -230,4 +244,44 @@ body {
     padding: 1.5rem 1rem;
     margin: 1rem auto;
   }
+}
+
+/*===================================
+  Custom Header & Schedule Tweaks
+===================================*/
+/* shrink gap under header */
+.page-header.text-center {
+  margin-bottom: 0.5rem !important;
+  padding-bottom: 0;
+}
+
+.page-header.text-center {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+}
+
+.schedule-header {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.schedule-title {
+  font-weight: 700;
+  color: #933C80;
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+
+.schedule-subtitle {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.session-card {
+  margin-bottom: 2rem;
+}
+
+.container {
+  padding: 2.5rem 1.5rem;
 }
