@@ -28,7 +28,7 @@ export default function HomePage() {
             `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
             {
               headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
-              params: { pageSize: 100, offset, sort: [{ field: 'Session Date/Time (from Retreat/Festival Sessions)', direction: 'asc' }] },
+              params: { pageSize: 100, offset, sort: [{ field: 'Session Date (from Retreat/Festival Sessions)', direction: 'asc' }] },
             }
           );
           all = all.concat(res.data.records);
@@ -87,12 +87,12 @@ export default function HomePage() {
 
   const formatDate = ds => {
     if (!ds) return 'TBD';
-    return new Date(ds).toLocaleString('en-US', {
-      timeZone: 'America/Chicago',
-      dateStyle: 'full',
-      timeStyle: 'short',
+    return new Date(ds).toLocaleDateString('en-US', {
+      timeZone: 'Asia/Dubai',
+      dateStyle: 'full'    // e.g. "Saturday, July 19, 2025"
     });
   };
+  
 
   if (loading)
     return (
@@ -163,7 +163,7 @@ export default function HomePage() {
                     <h4 className="session-title">{rec.fields[fieldSessionName]}</h4>
                     <p className="session-info"><strong>Role:</strong> {rec.fields[fieldRole] || 'Participant'}</p>
                     <p className="session-info"><strong>Description:</strong> {rec.fields['Event Description (from Retreat/Festival Sessions)'] || 'No description available'}</p>
-                    <p className="session-info"><strong>Date & Time:</strong> {formatDate(rec.fields['Session Date/Time (from Retreat/Festival Sessions)'])}</p>
+                    <p className="session-info"><strong>Date & Time:</strong> {formatDate(rec.fields['Session Date (from Retreat/Festival Sessions)'])}</p>
                     <p className="session-info"><strong>Location:</strong> {rec.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}</p>
                    {/* <p className="session-info mb-0"><strong>Event Contact:</strong> {rec.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}</p> */}
                   </div>
