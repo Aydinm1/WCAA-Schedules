@@ -205,7 +205,7 @@ export default function HomePage() {
 
           {/* footer note */}
           <p className="footer-note text-center">
-            If you require any further details, feel free to text or call +1 (555) 123-4567 — we will respond within 48 hours.
+            If you require any further details, please email talentinstitute@globalencounters.ismaili — we will respond within 48 hours.
           </p>
         </div>
       </div>
