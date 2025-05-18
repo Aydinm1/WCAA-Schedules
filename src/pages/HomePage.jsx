@@ -3,15 +3,15 @@ import axios from 'axios';
 
 export default function HomePage() {
   const [sessions, setSessions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
+  const [success, setSuccess]   = useState(false);
   const [participantName, setParticipantName] = useState('');
 
-  const personId = new URLSearchParams(window.location.search).get('id');
-  const fieldSessionName = 'Event Name';
-  const fieldRole = 'Role';
-  const fieldConfirmation = 'Confirmation from Invite?';
+  const personId           = new URLSearchParams(window.location.search).get('id');
+  const fieldSessionName   = 'Event Name';
+  const fieldRole          = 'Role';
+  const fieldConfirmation  = 'Confirmation from Invite?';
 
   useEffect(() => {
     if (!personId) {
@@ -28,13 +28,23 @@ export default function HomePage() {
             `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
             {
               headers: { Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}` },
-              params: { pageSize: 100, offset, sort: [{ field: 'Session Date (from Retreat/Festival Sessions)', direction: 'asc' }] },
+              params: {
+                pageSize: 100,
+                offset,
+                sort: [{ field: 'Session Date (from Retreat/Festival Sessions)', direction: 'asc' }]
+              },
             }
           );
           all = all.concat(res.data.records);
           offset = res.data.offset;
         } while (offset);
-        setSessions(all.filter(r => Array.isArray(r.fields['WCAA Assigned']) && r.fields['WCAA Assigned'].includes(personId)));
+
+        setSessions(
+          all.filter(r =>
+            Array.isArray(r.fields['WCAA Assigned']) &&
+            r.fields['WCAA Assigned'].includes(personId)
+          )
+        );
       } catch (err) {
         console.error(err);
         setError('Failed to load sessions.');
@@ -56,6 +66,8 @@ export default function HomePage() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+
+    // 1) gather only those confirmations where a choice was made
     const updates = sessions
       .map(s => {
         const val = document.getElementById(`confirmation-${s.id}`).value;
@@ -63,19 +75,31 @@ export default function HomePage() {
       })
       .filter(u => u.fields[fieldConfirmation] !== '');
 
-    if (!updates.length) return alert('Please make at least one selection before submitting.');
+    if (!updates.length) {
+      return alert('Please make at least one selection before submitting.');
+    }
+
+    // 2) your Airtable endpoint + headers
+    const url = `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    };
 
     try {
-      await axios.patch(
-        `https://api.airtable.com/v0/${import.meta.env.VITE_AIRTABLE_BASE_ID}/tblLYaj9vr91ryIH9`,
-        { records: updates },
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      // 3) patch the confirmation fields
+      await axios.patch(url, { records: updates }, config);
+
+      // 4) now lock every displayed session
+      const lockUpdates = sessions.map(s => ({
+        id: s.id,
+        fields: { Locked: true }
+      }));
+      await axios.patch(url, { records: lockUpdates }, config);
+
+      // 5) UI feedback
       setSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => setSuccess(false), 3000);
@@ -89,10 +113,9 @@ export default function HomePage() {
     if (!ds) return 'TBD';
     return new Date(ds).toLocaleDateString('en-US', {
       timeZone: 'Asia/Dubai',
-      dateStyle: 'full'    // e.g. "Saturday, July 19, 2025"
+      dateStyle: 'full',
     });
   };
-  
 
   if (loading)
     return (
@@ -119,21 +142,22 @@ export default function HomePage() {
   return (
     <div>
       <div className="container">
-        {/* full‑width‑of‑container banner */}
+        {/* Banner */}
         <img
           src="https://res.cloudinary.com/dl9d5br4j/image/upload/v1745126797/TI_Letterhead_4x6_1_hzopb5.png"
           alt="GE Festival Banner"
           className="banner-image banner-full"
         />
 
-<div className="page-header text-center">
-  <h2 className="confirmation-header">TI Retreat and GE Festival Confirmation</h2>
-  <div className="schedule-header">
-    <p className="schedule-title">Schedule for {participantName}</p>
-    <p className="schedule-subtitle">Please confirm your attendance for the events listed below.</p>
-  </div>
-</div>
-
+        <div className="page-header text-center">
+          <h2 className="confirmation-header">TI Retreat and GE Festival Confirmation</h2>
+          <div className="schedule-header">
+            <p className="schedule-title">Schedule for {participantName}</p>
+            <p className="schedule-subtitle">
+            Please confirm your attendance for the events listed below. We are working to finalize additional events to engage our World Class Artists and Athletes at the Festival. As these events are finalized, we will reach out for secondary confirmation.
+            </p>
+          </div>
+        </div>
 
         {success && (
           <div className="alert alert-success text-center fade-in-out">
@@ -154,18 +178,27 @@ export default function HomePage() {
                 key={rec.id}
                 className={`session-card ${
                   rec.fields[fieldConfirmation] === 'Yes' ? 'confirmed' : ''
-                } ${
-                  rec.fields[fieldConfirmation] === 'No' ? 'declined' : ''
-                }`}
+                } ${rec.fields[fieldConfirmation] === 'No' ? 'declined' : ''}`}
               >
                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-start">
                   <div className="session-details">
                     <h4 className="session-title">{rec.fields[fieldSessionName]}</h4>
-                    <p className="session-info"><strong>Role:</strong> {rec.fields[fieldRole] || 'Participant'}</p>
-                    <p className="session-info"><strong>Description:</strong> {rec.fields['Event Description (from Retreat/Festival Sessions)'] || 'No description available'}</p>
-                    <p className="session-info"><strong>Date & Time:</strong> {formatDate(rec.fields['Session Date (from Retreat/Festival Sessions)'])}</p>
-                    <p className="session-info"><strong>Location:</strong> {rec.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}</p>
-                   {/* <p className="session-info mb-0"><strong>Event Contact:</strong> {rec.fields['Festival POC (from Retreat/Festival Sessions)'] || 'N/A'}</p> */}
+                    <p className="session-info">
+                      <strong>Role:</strong> {rec.fields[fieldRole] || 'Participant'}
+                    </p>
+                    <p className="session-info">
+                      <strong>Description:</strong>{' '}
+                      {rec.fields['Event Description (from Retreat/Festival Sessions)'] ||
+                        'No description available'}
+                    </p>
+                    <p className="session-info">
+                      <strong>Date:</strong>{' '}
+                      {formatDate(rec.fields['Session Date (from Retreat/Festival Sessions)'])}
+                    </p>
+                    <p className="session-info">
+                      <strong>Location:</strong>{' '}
+                      {rec.fields['Session Location (from Retreat/Festival Sessions)'] || 'TBD'}
+                    </p>
                   </div>
 
                   <div className="session-action">
@@ -189,8 +222,12 @@ export default function HomePage() {
                       <option value="No">No, I can't attend</option>
                     </select>
                     {rec.fields['Locked'] && (
-                      <p className="mt-2 text-secondary small" style={{ fontStyle: 'italic' }}>
-                        This response is now locked. Please contact your relationship manager to make changes.
+                      <p
+                        className="mt-2 text-secondary small"
+                        style={{ fontStyle: 'italic' }}
+                      >
+                        This response is now locked. Please contact your relationship manager to
+                        make changes.
                       </p>
                     )}
                   </div>
@@ -207,7 +244,11 @@ export default function HomePage() {
 
           {/* footer note */}
           <p className="footer-note text-center">
-            If you require any further details, please email talentinstitute@globalencounters.ismaili — we will respond within 48 hours.
+            If you require any further details, please email{' '}
+            <a href="mailto:talentinstitute@globalencounters.ismaili">
+              talentinstitute@globalencounters.ismaili
+            </a>{' '}
+            — we will respond within 48 hours.
           </p>
         </div>
       </div>
