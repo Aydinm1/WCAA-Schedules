@@ -11,7 +11,7 @@ export default function HomePage() {
   const personId           = new URLSearchParams(window.location.search).get('id');
   const fieldSessionName   = 'Event Name';
   const fieldRole          = 'Role';
-  const fieldConfirmation  = 'Confirmation from Invite?';
+  const fieldConfirmation  = 'Session Confirmation';
 
   useEffect(() => {
     if (!personId) {
