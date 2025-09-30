@@ -18,25 +18,26 @@ The system was built to automate **participant management**, **session schedulin
   - Financial aid and accommodation tracking  
 
 **Example:**  
-![Airtable Event Participation Table](images/event-participation.png)
+![Airtable Event Participation Table](images/airtableScheduleConfirmation.png)
 
 ---
 
 ### 2. Multi-Version Registration & RSVP Flows
-- **4 versions of registration forms** based on attendee type (e.g., artists, athletes, volunteers).  
+- **4 versions of registration forms** based on attendee 
 - **Capacity-aware RSVP forms** with:
-  - Single-select lunch sessions (limited capacity)
+  - Dynamic information including name and specific sessions 
   - Locking features to prevent changes after deadlines
-  - Prefilled bios for easy editing by attendees  
+  - Custom header and graphics
+  - [RSVP Site](https://gefestival-wcaa-schedules.web.app/?id=reczkPIY46AUgwxwb)
 
 **Example:**  
-![Registration Form Screenshot](images/registration-form.png)
+![Registration Form Screenshot](images/event-participation.png)
 
 ---
 
 ### 3. Custom Email Automations
 - **5 versions of personalized emails** generated dynamically in Airtable:
-  - Invitation emails with unique RSVP links  
+  - Invitation emails with unique RSVP links and static schedule in email body using javascript  
   - Confirmation messages with event details  
   - Reminder follow-ups based on RSVP status  
 - **Zapier workflows** handle:
@@ -45,7 +46,9 @@ The system was built to automate **participant management**, **session schedulin
   - JavaScript steps for formatting event details in real time  
 
 **Example:**  
-![Personalized Email Screenshot](images/email-sample.png)
+![Personalized Email Screenshot](images/email-sample.png) 
+and 
+![Personalized Email Screenshot](images/email-sample2.png)
 
 ---
 
@@ -82,6 +85,7 @@ The system was built to automate **participant management**, **session schedulin
 
 **Example:**  
 ![Zapier Automation Workflow](images/zapier-automation.png)
+![Airtable Automation Workflow](images/airtable-automation.png)
 
 ---
 
